@@ -12,11 +12,11 @@ All events which programmers call "errors" can be separated to two types.
 * Events caused by external factors. Like network connection failure.
 * Events caused by programmer's mistake. Like reaching a switch operator case which should be unreachable. 
 
-We process events of the first type in regular control flow. For example we react to network failure by showing message to a user and setting app for waiting of network connection recovery.
+We process events of the first type in regular control flow. For example, we react to network failure by showing a message to a user and setting app for waiting of network connection recovery.
 
-We try to find out and exclude events of the second type as early as possible, before code goes to production. One of the approach here is to run some [runtime checks terminating program execution](https://developer.apple.com/documentation/swift/swift_standard_library/debugging_and_reflection) in a debuggable sate and print message with indication of where in code the error is happened.
+We try to find out and exclude events of the second type as early as possible before code goes to production. One of the approaches here is to run some [runtime checks terminating program execution](https://developer.apple.com/documentation/swift/swift_standard_library/debugging_and_reflection) in a debuggable sate and print message with an indication of where in a code the error has happened.
 
-For example programmer may terminate execution if required initializer wasn't provided but was called. That will be inevitably noticed and fixed at first test run.
+For example, a programmer may terminate execution if required initializer wasn't provided but was called. That will be inevitably noticed and fixed at first test run.
 
 ```swift
 required init?(coder aDecoder: NSCoder) {
@@ -39,7 +39,7 @@ default:
 }
 ```
 
-Again programmer is going to get crash during debugging here in oder to inevitably notice bug in indexing.
+Again programmer is going to get crash during debugging here in order to inevitably notice a bug in indexing.
 
 There are five terminating functions from the Swift Standard Library (as for Swift 4.2).
 
@@ -66,15 +66,15 @@ func fatalError(_ message: @autoclosure () -> String = default, file: StaticStri
 Let's look at [source code](https://github.com/apple/swift/blob/master/stdlib/public/core/Assert.swift). We can see right away the following.
 
 1. Every one of these five functions either terminates program execution or just doing nothing.
-2. Possible termination happens by two ways.
-	* Either with printing convenient debug message by calling `_assertionFailure(_:_:file:line:flags:)`.
-	* Or without debug message just by calling `Builtin.condfail(error._value)` or `Builtin.int_trap()`.
+2. Possible termination happens in two ways.
+    * Either with printing convenient debug message by calling `_assertionFailure(_:_:file:line:flags:)`.
+    * Or without debug message just by calling `Builtin.condfail(error._value)` or `Builtin.int_trap()`.
 3. The difference between five terminating functions is in the conditions when all of the above happens.
 4. `fatalError(_:file:line)` calls `_assertionFailure(_:_:file:line:flags:)` unconditionally.
-4. The other four terminating functions evaluate conditions by calling the following configuration evaluation functions. (They begin with underscore which means that they are internal and are not supposed to be called directly by programmer who uses Swift Standard Library).
-	* `_isReleaseAssertConfiguration()`
-	* `_isDebugAssertConfiguration()`
-	* `_isFastAssertConfiguration()`
+5. The other four terminating functions evaluate conditions by calling the following configuration evaluation functions. (They begin with an underscore which means that they are internal and are not supposed to be called directly by a programmer who uses Swift Standard Library).
+    * `_isReleaseAssertConfiguration()`
+    * `_isDebugAssertConfiguration()`
+    * `_isFastAssertConfiguration()`
 
 Then let's look at [documentation](https://developer.apple.com/documentation/swift/swift_standard_library/debugging_and_reflection). We can see right away the following.
 
@@ -83,10 +83,10 @@ Then let's look at [documentation](https://developer.apple.com/documentation/swi
 3. We can set these build flags in Xcode through `SWIFT_OPTIMIZATION_LEVEL` compiler build setting.
 4. Also from Xcode 10 [documentation](https://help.apple.com/xcode/mac/10.0/#/itcaec37c2a6) we know that one more optimization flag — `-Osize` — is introduced.
 5. So we have the four optimization build flags to consider.
-	* `-Onone` (don't optimize)
-	* `-O` (optimize for speed)
-	* `-Osize` (optimize for size)
-	* `-Ounchecked` (switch off many compiler checks)
+    * `-Onone` (don't optimize)
+    * `-O` (optimize for speed)
+    * `-Osize` (optimize for size)
+    * `-Ounchecked` (switch off many compiler checks)
 
 We may conclude that configuration evaluated in four terminating functions is set by those build flags.
 
@@ -125,14 +125,14 @@ false
 Those tests and [source code](https://github.com/apple/swift/blob/master/stdlib/public/core/Assert.swift) inspection lead us to the following not very strict conclusions.
 
 There are three mutually exclusive configurations.
-	
+    
 * *Release* configuration is set by providing either `-O` or `-Osize` build flag.
 * *Debug* configuration is set by providing either `-Onone` build flag or none optimization flags at all.
-* `_isFastAssertConfiguration()` is evaluated to `true` if `-Ounchecked` build flag is set. And although this function has a word "fast" in it's name it has nothing to do with optimizing for speed `-O` build flag in spite of the misleading naming.
+* `_isFastAssertConfiguration()` is evaluated to `true` if `-Ounchecked` build flag is set. And although this function has a word "fast" in its name it has nothing to do with optimizing for speed `-O` build flag in spite of the misleading naming.
 
-**NB:** Those conclusions are not strict definition of when *debug* builds or *release* builds are taking place. It's more complex issue. But those conclusions are correct for the context of terminating functions usage.
+**NB:** Those conclusions are not the strict definition of when *debug* builds or *release* builds are taking place. It's a more complex issue. But those conclusions are correct for the context of terminating functions usage.
 
-## Simplifyig The Picture
+## Simplifying The Picture
 
 ### `-Ounchecked`
 
@@ -158,7 +158,7 @@ Two of terminating functions let us check for conditions. [Source code](https://
 * `precondition(_:_:file:line:)` becomes `preconditionFailure(_:file:line)`,
 * `assert(_:_:file:line:)` becomes `assertionFailure(_:file:line:)`.
 
-That knowledge simplify our further analysis.
+That knowledge simplifies our further analysis.
 
 ###  Release vs Debug Configurations
 
@@ -168,13 +168,13 @@ Further documentation and source code inspection let us eventually formulate the
 
 It's clear now that the most important choice for a programmer is what should be a program behavior **in _release_** when runtime check reveals an error.
 
-The key take away here is that `assert(_:_:file:line:)` and `assertionFailure(_:file:line:)` let program fail *not so badly*. For example iOS app may have corrupted UI (since some important runtime checks was failed) but wan't crash.
+The key takeaway here is that `assert(_:_:file:line:)` and `assertionFailure(_:file:line:)` let program fail *not so badly*. For example, iOS app may have corrupted UI (since some important runtime checks were failed) but won't crash.
 
-But that scenario may easy be not the one you wanted. You have a choice.
+But that scenario may easily be not the one you wanted. You have a choice.
 
 ## `Never` Return Type
 
-`Never` is used as a return type of functions that unconditionally throw an error, traps, or otherwise do not terminate normally. Those kind of funstions do not actually return, they **never** return.
+`Never` is used as a return type of functions that unconditionally throw an error, traps, or otherwise do not terminate normally. Those kinds of functions do not actually return, they **never** return.
 
 Among five terminating functions only `preconditionFailure(_:file:line)` and `fatalError(_:file:line)` return `Never` because only those two functions unconditionally stop program execution therefore never return.
 
@@ -192,7 +192,7 @@ guard CommandLine.argc == 2 else {
 // ...
 ```
 
-If `printUsagePromptAndExit()` returned `Void` instead of `Never` you would get a buildtime error with the message: "*'guard' body must not fall through, consider using a 'return' or 'throw' to exit the scope*". Using `Never` you are saying in advance that you **never** exit the scope and therefore compiler won't give you a buildtime error. Otherwise you should add `return` at the end of guard code block, which isn't look nice.
+If `printUsagePromptAndExit()` returned `Void` instead of `Never` you would get a buildtime error with the message: "*'guard' body must not fall through, consider using a 'return' or 'throw' to exit the scope*". Using `Never` you are saying in advance that you **never** exit the scope and therefore compiler won't give you a buildtime error. Otherwise, you should add `return` at the end of guard code block, which doesn't look nice.
 
 ## Takeaways
 
@@ -206,4 +206,4 @@ If `printUsagePromptAndExit()` returned `Void` instead of `Never` you would get 
 * [WWDC video "What's New in Swift"](https://developer.apple.com/videos/play/wwdc2018/401) telling about `SWIFT_OPTIMIZATION_LEVEL` build setting (from 11 minute).
 * [How Never Works Internally in Swift](https://swiftrocks.com/how-never-works-internally-in-swift.html)
 * [NSHipster's article about nature of `Never`](https://nshipster.com/never/)
-* [Swift Forums discussion](https://forums.swift.org/t/deprecating-ounchecked/6928) about suggestion to deprecate `-Ounchecked`. 
+* [Swift Forums discussion](https://forums.swift.org/t/deprecating-ounchecked/6928) about suggestion to deprecate `-Ounchecked`.
