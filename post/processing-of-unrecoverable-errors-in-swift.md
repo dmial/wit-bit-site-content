@@ -1,13 +1,12 @@
 ---
 title: "Processing of Unrecoverable Errors in Swift"
-date: 2018-11-16T16:22:03+03:00
-draft: true
+date: 2018-12-19T23:49:50+03:00
 description: "Learn the Swift Standard Library analyzing its source code. We'll find out all the details about fatalError(_:file:line), assertionFailure(_:file:line:) and other similar terminating functions. And we'll understand in what circumstances what exact function we should call."
 ---
 
 ## Preface: it's all about research approach
 
-This article is an example of how we can do a research of the Swift Standard Library functions behaviour building our knowledge not only on the Library documentation but also on its source code.
+This article is an example of how we can do a research of the Swift Standard Library functions behavior building our knowledge not only on the Library documentation but also on its source code.
 
 ## Unrecoverable Errors
 
