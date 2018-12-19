@@ -2,12 +2,16 @@
 title: "Processing of Unrecoverable Errors in Swift"
 date: 2018-11-16T16:22:03+03:00
 draft: true
-description: "There are unrecoverable errors. We do special runtime checks to anticipate those errors and if that check fails we call fatalError(_:file:line), assertionFailure(_:file:line:) or other similar terminating function. In what circumstances what exact function should we call?"
+description: "Learn the Swift Standard Library analyzing its source code. We'll find out all the details about fatalError(_:file:line), assertionFailure(_:file:line:) and other similar terminating functions. And we'll understand in what circumstances what exact function we should call."
 ---
+
+## Preface: it's all about research approach
+
+This article is an example of how we can do a research of the Swift Standard Library functions behaviour building our knowledge not only on the Library documentation but also on its source code.
 
 ## Unrecoverable Errors
 
-All events which programmers call "errors" can be separated to two types.
+All events which programmers call "errors" can be separated into two types.
 
 * Events caused by external factors. Like network connection failure.
 * Events caused by programmer's mistake. Like reaching a switch operator case which should be unreachable. 
@@ -63,9 +67,9 @@ func fatalError(_ message: @autoclosure () -> String = default, file: StaticStri
 
 ## Source Code vs Documentation
 
-Let's look at [source code](https://github.com/apple/swift/blob/master/stdlib/public/core/Assert.swift). We can see right away the following.
+Let's look at [source code](https://github.com/apple/swift/blob/master/stdlib/public/core/Assert.swift). We can see right away the following:
 
-1. Every one of these five functions either terminates program execution or just doing nothing.
+1. Every one of these five functions either terminates the program execution or just does nothing.
 2. Possible termination happens in two ways.
     * Either with printing convenient debug message by calling `_assertionFailure(_:_:file:line:flags:)`.
     * Or without debug message just by calling `Builtin.condfail(error._value)` or `Builtin.int_trap()`.
@@ -168,7 +172,7 @@ Further documentation and source code inspection let us eventually formulate the
 
 It's clear now that the most important choice for a programmer is what should be a program behavior **in _release_** when runtime check reveals an error.
 
-The key takeaway here is that `assert(_:_:file:line:)` and `assertionFailure(_:file:line:)` let program fail *not so badly*. For example, iOS app may have corrupted UI (since some important runtime checks were failed) but won't crash.
+The key takeaway here is that `assert(_:_:file:line:)` and `assertionFailure(_:file:line:)` make the impact of program failure less severe. For example, iOS app may have corrupted UI (since some important runtime checks were failed) but won't crash.
 
 But that scenario may easily be not the one you wanted. You have a choice.
 
@@ -178,7 +182,7 @@ But that scenario may easily be not the one you wanted. You have a choice.
 
 Among five terminating functions only `preconditionFailure(_:file:line)` and `fatalError(_:file:line)` return `Never` because only those two functions unconditionally stop program execution therefore never return.
 
-Here is a nice example of utilizing `Never` type in some command line app. (Although this example uses not SwiftStandard Library terminating functions but standard C `exit()` function).
+Here is a nice example of utilizing `Never` type in some command line app. (Although this example doesn’t use Swift Standard Library terminating functions but standard C `exit()` function instead).
 
 ```swift
 func printUsagePromptAndExit() -> Never {
