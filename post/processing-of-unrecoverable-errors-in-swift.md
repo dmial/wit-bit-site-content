@@ -201,7 +201,7 @@ If `printUsagePromptAndExit()` returned `Void` instead of `Never` you would get 
 
 * It doesn't matter what terminating function to use if you are sure that all your runtime checks are relevant only for *Debug* configuration.
 * Use only `fatalError(_:file:line)` while applying `-Ounchecked` and at the same time considering that the point of your program with `fatalError(_:file:line)` instruction is reachable.
-* Use `assert(_:_:file:line:)` and `assertionFailure(_:file:line:)` if you are afraid that runtime checks may fail somehow in release. At least your app wan't crash.
+* Use `assert(_:_:file:line:)` and `assertionFailure(_:file:line:)` if you are afraid that runtime checks may fail somehow in release. At least your app won't crash.
 * Use `Never` to make your code look neat.
 
 ## Useful Links
