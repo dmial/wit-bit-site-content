@@ -4,7 +4,7 @@ date: 2018-12-19T23:49:50+03:00
 description: "Learn the Swift Standard Library analyzing its source code. We'll find out all the details about fatalError(_:file:line), assertionFailure(_:file:line:) and other similar terminating functions. And we'll understand in what circumstances what exact function we should call."
 ---
 
-## Preface: it's all about research approach
+## Preface: it's all about the research approach
 
 This article is an example of how we can do a research of the Swift Standard Library functions behavior building our knowledge not only on the Library documentation but also on its source code.
 
@@ -19,7 +19,7 @@ We process events of the first type in regular control flow. For example, we rea
 
 We try to find out and exclude events of the second type as early as possible before code goes to production. One of the approaches here is to run some [runtime checks terminating program execution](https://developer.apple.com/documentation/swift/swift_standard_library/debugging_and_reflection) in a debuggable sate and print message with an indication of where in a code the error has happened.
 
-For example, a programmer may terminate execution if required initializer wasn't provided but was called. That will be inevitably noticed and fixed at first test run.
+For example, a programmer may terminate execution if required initializer wasn't provided but was called. That will be inevitably noticed and fixed at the first test run.
 
 ```swift
 required init?(coder aDecoder: NSCoder) {
@@ -177,7 +177,7 @@ But that scenario may easily be not the one you wanted. You have a choice.
 
 ## `Never` Return Type
 
-`Never` is used as a return type of functions that unconditionally throw an error, traps, or otherwise do not terminate normally. Those kinds of functions do not actually return, they **never** return.
+`Never` is used as a return type of functions that unconditionally throw an error, traps, or otherwise, do not terminate normally. Those kinds of functions do not actually return, they **never** return.
 
 Among five terminating functions only `preconditionFailure(_:file:line)` and `fatalError(_:file:line)` return `Never` because only those two functions unconditionally stop program execution therefore never return.
 
@@ -195,7 +195,7 @@ guard CommandLine.argc == 2 else {
 // ...
 ```
 
-If `printUsagePromptAndExit()` returned `Void` instead of `Never` you would get a buildtime error with the message: "*'guard' body must not fall through, consider using a 'return' or 'throw' to exit the scope*". Using `Never` you are saying in advance that you **never** exit the scope and therefore compiler won't give you a buildtime error. Otherwise, you should add `return` at the end of guard code block, which doesn't look nice.
+If `printUsagePromptAndExit()` returned `Void` instead of `Never` you would get a buildtime error with the message: "*'guard' body must not fall through, consider using a 'return' or 'throw' to exit the scope*". Using `Never` you are saying in advance that you **never** exit the scope and therefore compiler won't give you a buildtime error. Otherwise, you should add `return` at the end of the guard code block, which doesn't look nice.
 
 ## Takeaways
 
