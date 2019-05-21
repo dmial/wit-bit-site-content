@@ -143,7 +143,7 @@ Let's look not at **what the `-Ounchecked` flag is for** (it's irrelevant here) 
 
 * Documentation for `precondition(_:_:file:line:)` and `assert(_:_:file:line:)` says, "In `-Ounchecked` builds, condition is not evaluated, but the optimizer may assume that it always evaluates to true. Failure to satisfy that assumption is a serious programming error."
 * Documentation for `preconditionFailure(_:file:line)` and `assertionFailure(_:file:line:)` says, "In `-Ounchecked` builds, the optimizer may assume that this function is never called. Failure to satisfy that assumption is a serious programming error."
-* We can see from the [source code](https://github.com/apple/swift/blob/master/stdlib/public/core/Assert.swift) that evaluation of `_isFastAssertConfiguration()` to `true` **should not happen**. (If it does happen, strange `_conditionallyUnreachable()` is called, see [see lines 136 and 176](https://github.com/apple/swift/blob/master/stdlib/public/core/Assert.swift).
+* We can see from the [source code](https://github.com/apple/swift/blob/master/stdlib/public/core/Assert.swift) that evaluation of `_isFastAssertConfiguration()` to `true` **should not happen**. (If it does happen, strange `_conditionallyUnreachable()` is called. See [see lines 136 and 176](https://github.com/apple/swift/blob/master/stdlib/public/core/Assert.swift).)
 
 Speaking more directly, you **must not allow reachability** of the following four terminating functions with the `-Ounchecked` build flag set for your program.
 
